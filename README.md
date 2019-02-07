@@ -4,7 +4,7 @@ This repository allows you to quickly setup a Storidge (http://storidge.com/) en
 
 ## Requirements
 
-Install Vagrant: https://www.vagrantup.com/
+Install Vagrant: https://www.vagrantup.com/ and Virtualbox: https://www.virtualbox.org/
 
 ## Configuration
 
