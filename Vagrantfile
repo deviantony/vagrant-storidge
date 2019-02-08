@@ -1,35 +1,44 @@
+# Number of nodes inside the Storidge cluster
+STORIDGE_CLUSTER_NODES = ENV['VAGRANT_STORIDGE_CLUSTER_NODES'].nil? ? 3 : ENV['VAGRANT_STORIDGE_CLUSTER_NODES'].to_i
 # Memory associated to each Storidge (MB)
-STORIDGE_NODE_MEM = "512"
+STORIDGE_NODE_MEM = ENV['VAGRANT_STORIDGE_NODE_MEM'].nil? ? '512': ENV['VAGRANT_STORIDGE_NODE_MEM']
 # Number of data disks per Storidge node
-STORIDGE_DISK_COUNT = 3
-# Storidge data disks size
-STORIDGE_DATA_DISK_SIZE = 2 * 1024
-
+STORIDGE_DISK_COUNT = ENV['VAGRANT_STORIDGE_DISK_COUNT'].nil? ? 3 : ENV['VAGRANT_STORIDGE_DISK_COUNT'].to_i
+# Storidge data disks size in GB
+STORIDGE_DATA_DISK_SIZE = ENV['VAGRANT_STORIDGE_DATA_DISK_SIZE'].nil? ? 2 : ENV['VAGRANT_STORIDGE_DATA_DISK_SIZE'].to_i
 
 SCRIPT_STORIDGE_SETUP = <<SCRIPT
+ssh-keygen -t rsa -N "" -f /root/.ssh/id_rsa;
+cp /root/.ssh/id_rsa.pub /shared;
 curl -fsSL ftp://download.storidge.com/pub/ce/cio-ce | bash;
-INIT_COMMAND=$(cioctl create --ip 10.0.9.10 | grep "cioctl init" | awk '{$1=$1};1');
-${INIT_COMMAND};
 SCRIPT
 
 Vagrant.configure(2) do |config|
-  config.vm.define "storidge1" do |config|
-    config.vm.box = "ubuntu/xenial64"
-    config.vm.hostname = "storidge1"
-    config.vm.network "private_network", ip: "10.0.9.10"
-    config.vm.provision "shell", inline: SCRIPT_STORIDGE_SETUP
-    config.vm.synced_folder ".", "/vagrant", disabled: true
 
+  (1..STORIDGE_CLUSTER_NODES).each do |i|
 
-    config.vm.provider "virtualbox" do |vb|
-      vb.memory = STORIDGE_NODE_MEM
+    config.vm.define "storidge-#{i}" do |node|
 
-      (1..STORIDGE_DISK_COUNT).each do |i|
-        unless File.exist?("storidge1_disk#{i}.vdi")
-          vb.customize ["createhd", "--filename", "storidge1_disk#{i}.vdi", "--size", STORIDGE_DATA_DISK_SIZE]
+      node.vm.box = "ubuntu/xenial64"
+      node.vm.hostname = "storidge-#{i}"
+      node.vm.network :private_network, ip: "10.0.9.#{i + 9}"
+      node.vm.provision "shell", inline: SCRIPT_STORIDGE_SETUP
+      node.vm.synced_folder ".", "/vagrant", disabled: true
+      node.vm.synced_folder "storidge-#{i}", "/shared", create: true
+      node.vm.provider "virtualbox" do |vb|
+
+        vb.memory = STORIDGE_NODE_MEM
+        (1..STORIDGE_DISK_COUNT).each do |j|
+          unless File.exist?("disks/storidge-#{i}_disk#{j}.vdi")
+            vb.customize ["createhd", "--filename", "disks/storidge-#{i}_disk#{j}.vdi", "--size", STORIDGE_DATA_DISK_SIZE * 1024]
+          end
+          vb.customize ["storageattach", :id,  "--storagectl", "SCSI", "--port", j + 1, "--device", 0, "--type", "hdd", "--medium", "disks/storidge-#{i}_disk#{j}.vdi"]
         end
-        vb.customize ["storageattach", :id,  "--storagectl", "SCSI", "--port", i + 1, "--device", 0, "--type", "hdd", "--medium", "storidge1_disk#{i}.vdi"]
+
       end
+
     end
+
   end
+
 end
