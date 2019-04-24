@@ -49,3 +49,16 @@ A convenience setup script can be used to setup:
 ```
 
 After the setup is completed, you can access the Portainer interface on *10.0.9.10:9000*.
+
+## Problem with latest kernel version
+
+**WARNING - 25.04.2019**: Due to an issue with CIO 2751 and latest kernel version (4.4.0-146), we need to force the kernel version to 4.4.0-142.
+
+Use the following scripts to setup the cluster:
+
+```
+./01-rollback-kernel.sh
+# Wait for cluster to reboot entirely
+./02-install-cio.sh
+./03-setup-cluster.sh
+```

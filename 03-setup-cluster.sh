@@ -16,7 +16,7 @@ vagrant upload storidge-2/id_rsa.pub /tmp/id_rsa.pub.2 storidge-3
 vagrant ssh storidge-3 --no-tty -c "cat /tmp/id_rsa.pub.1 | sudo tee -a /root/.ssh/authorized_keys"
 vagrant ssh storidge-3 --no-tty -c "cat /tmp/id_rsa.pub.2 | sudo tee -a /root/.ssh/authorized_keys"
 
-vagrant ssh storidge-1 --no-tty -c "sudo sed -i 's/ExecStart=\/usr\/bin\/dockerd -H unix:\/\//ExecStart=\/usr\/bin\/dockerd -H unix:\/\/ -H tcp:\/\/10.0.9.10:2375/g' /lib/systemd/system/docker.service"
+vagrant ssh storidge-1 --no-tty -c "sudo sed -i 's/ExecStart=\/usr\/bin\/dockerd -H fd:\/\//ExecStart=\/usr\/bin\/dockerd -H fd:\/\/ -H tcp:\/\/10.0.9.10:2375/g' /lib/systemd/system/docker.service"
 vagrant ssh storidge-1 --no-tty -c "sudo systemctl daemon-reload && sudo systemctl restart docker"
 
 CLUSTER_CREATE_OUTPUT=$(vagrant ssh storidge-1 --no-tty -c "sudo cioctl create --ip 10.0.9.10")
