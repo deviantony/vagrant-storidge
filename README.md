@@ -57,8 +57,7 @@ After the setup is completed, you can access the Portainer interface on *10.0.9.
 Use the following scripts to setup the cluster:
 
 ```
-./01-downgrade-kernel.sh
+./1-downgrade-kernel.sh
 # Wait for cluster to reboot entirely
-./02-install-cio.sh
-./03-setup-cluster.sh
+./2-install-cio-and-setup-clister.sh
 ```
