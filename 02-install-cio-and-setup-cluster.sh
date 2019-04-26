@@ -9,20 +9,21 @@ then
 fi
 
 # Install CIO on all machines
-install_cio() {
+function install_cio() {
     echo " ===== STARTING CIO INSTALL FOR ${STORIDGE_CLUSTER_NODES} MACHINES ====="
 
     for (( i=1; i<=$STORIDGE_CLUSTER_NODES; i++ ))
     do
-        (vagrant ssh storidge-$i --no-tty -c "${INSTALL_CIO}" | sed "s/^/[storidge-$i] /") &
+        (vagrant ssh storidge-$i --no-tty -c "${INSTALL_CIO}" > install_cio.storidge-$i.log) &
     done
     wait
 
     echo " ===== CIO SUCCESSFULLY INSTALLED ====="
+    exit 0
 }
 
 # Copy keys across all machines
-copy_keys() {
+function copy_keys() {
     echo " ===== COPYING SSH KEYS ====="
 
     for (( i=1; i<=$STORIDGE_CLUSTER_NODES; i++ ))
@@ -38,10 +39,11 @@ copy_keys() {
     wait
 
     echo " ===== SSH KEYS COPIED ====="
+    exit 0
 }
 
 # Add keys to authorized keys
-authorize_keys() {
+function authorize_keys() {
     echo " ===== ADDING SSH KEYS TO AUTHORIZED KEYS ====="
 
     for (( i=1; i<=$STORIDGE_CLUSTER_NODES; i++ ))
@@ -57,10 +59,11 @@ authorize_keys() {
     wait
 
     echo " ===== SSH KEYS ADDED TO AUTHORIZED KEYS ====="
+    exit 0
 }
 
 # Setup cio cluster
-setup_cluster() {
+function setup_cluster() {
     echo " ===== STARTING CLUSTER SETUP FOR ${STORIDGE_CLUSTER_NODES} NODES ====="
 
     vagrant ssh storidge-1 --no-tty -c "sudo sed -i 's/ExecStart=\/usr\/bin\/dockerd -H fd:\/\//ExecStart=\/usr\/bin\/dockerd -H fd:\/\/ -H tcp:\/\/10.0.9.10:2375/g' /lib/systemd/system/docker.service"
@@ -79,10 +82,32 @@ setup_cluster() {
     vagrant ssh storidge-1 --no-tty -c "sudo ${INIT_COMMAND}"
 
     echo " ===== CLUSTER SETUP FINISHED ====="
+    exit 0
 }
 
-install_cio
-copy_keys
-authorize_keys
-setup_cluster
+case "$1" in
+    1)
+        install_cio
+        ;;
+    2)
+        copy_keys
+        authorize_keys
+        ;;
+    3)
+        setup_cluster
+        ;;
+    all)
+        install_cio
+        copy_keys
+        authorize_keys
+        setup_cluster
+        ;;
+    *)
+        echo "Usage: ./02-install-cio-and-setup-cluster.sh { 1 | 2 | 3 | all }"
+        echo "  where: 1 - cio install"
+        echo "         2 - ssh keys copies across cluster"
+        echo "         3 - cluster setup"
+        echo "         all - run all steps"
+        ;;
+esac
 exit 0
