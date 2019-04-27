@@ -8,13 +8,18 @@ then
     STORIDGE_CLUSTER_NODES=${VAGRANT_STORIDGE_CLUSTER_NODES}
 fi
 
+if [ ! -d "logs" ]
+then
+    mkdir logs
+fi
+
 # Install CIO on all machines
 function install_cio() {
     echo " ===== STARTING CIO INSTALL FOR ${STORIDGE_CLUSTER_NODES} MACHINES ====="
 
     for (( i=1; i<=$STORIDGE_CLUSTER_NODES; i++ ))
     do
-        (vagrant ssh storidge-$i --no-tty -c "${INSTALL_CIO}" > install_cio.storidge-$i.log) &
+        (vagrant ssh storidge-$i --no-tty -c "${INSTALL_CIO}" > logs/install_cio.storidge-$i.log) &
     done
     wait
 

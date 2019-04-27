@@ -22,9 +22,9 @@ install() {
     echo " ===== KERNEL INSTALLED ON ALL MACHINES ====="
 }
 
-# Rollback kernel on all machines
-rollback() {
-    echo " ===== STARTING KERNEL ROLLBACK FOR ${STORIDGE_CLUSTER_NODES} MACHINES ====="
+# Downgrade kernel on all machines
+downgrade() {
+    echo " ===== STARTING KERNEL DOWNGRADE FOR ${STORIDGE_CLUSTER_NODES} MACHINES ====="
 
     for (( i=1; i<=$STORIDGE_CLUSTER_NODES; i++ ))
     do
@@ -36,5 +36,5 @@ rollback() {
 }
 
 install
-rollback
+downgrade
 exit 0
