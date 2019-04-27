@@ -19,12 +19,13 @@ function install_cio() {
 
     for (( i=1; i<=$STORIDGE_CLUSTER_NODES; i++ ))
     do
-        (vagrant ssh storidge-$i --no-tty -c "${INSTALL_CIO}" > logs/install_cio.storidge-$i.log) &
+        echo " === Starting install for machine storidge-$i ==="
+        echo " = Install logs are in logs/install_cio.storidge-$i.log ="
+        (vagrant ssh storidge-$i --no-tty -c "${INSTALL_CIO}" 2>&1 | tee logs/install_cio.storidge-$i.log) &
     done
     wait
 
     echo " ===== CIO SUCCESSFULLY INSTALLED ====="
-    exit 0
 }
 
 # Copy keys across all machines
@@ -44,7 +45,6 @@ function copy_keys() {
     wait
 
     echo " ===== SSH KEYS COPIED ====="
-    exit 0
 }
 
 # Add keys to authorized keys
@@ -64,7 +64,6 @@ function authorize_keys() {
     wait
 
     echo " ===== SSH KEYS ADDED TO AUTHORIZED KEYS ====="
-    exit 0
 }
 
 # Setup cio cluster
@@ -87,7 +86,6 @@ function setup_cluster() {
     vagrant ssh storidge-1 --no-tty -c "sudo ${INIT_COMMAND}"
 
     echo " ===== CLUSTER SETUP FINISHED ====="
-    exit 0
 }
 
 case "$1" in
