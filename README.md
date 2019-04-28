@@ -59,6 +59,5 @@ Use the following scripts to setup the cluster:
 ```
 ./01-downgrade-kernel.sh
 # Wait for cluster to reboot entirely
-./02-install-cio.sh
-./03-setup-cluster.sh
+./02-install-cio-and-setup-clister.sh all
 ```
