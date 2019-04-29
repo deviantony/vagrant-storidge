@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-INSTALL_KERNEL="sudo apt-get update && sudo apt-get install -y linux-image-4.4.0-142 linux-image-extra-4.4.0-142 linux-headers-4.4.0-142 linux-headers-4.4.0-142-generic"
+KERNEL_VERSION="4.4.0-142"
+INSTALL_KERNEL="sudo apt-get update && sudo apt-get install -y linux-image-${KERNEL_VERSION} linux-image-extra-${KERNEL_VERSION} linux-headers-${KERNEL_VERSION} linux-headers-${KERNEL_VERSION}-generic"
 DOWNGRADE_KERNEL="sudo sed -i 's/GRUB_DEFAULT=0/GRUB_DEFAULT=saved/g' /etc/default/grub && sudo update-grub && sudo grub-set-default \"1>4\" && sudo grub-reboot \"1>4\" && sudo reboot;"
 STORIDGE_CLUSTER_NODES=3
 

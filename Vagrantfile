@@ -13,7 +13,7 @@ STORIDGE_DATA_DISK_SIZE = ENV['VAGRANT_STORIDGE_DATA_DISK_SIZE'].nil? ? 2 : ENV[
 # curl -fsSL ftp://download.storidge.com/pub/ce/cio-ce | bash;
 # SCRIPT
 
-SCRIPT_STORIDGE_SETUP = <<SCRIPT
+PROVISION_SCRIPT = <<SCRIPT
 ssh-keygen -t rsa -N "" -f /root/.ssh/id_rsa;
 cp /root/.ssh/id_rsa.pub /shared;
 SCRIPT
@@ -26,7 +26,7 @@ Vagrant.configure(2) do |config|
       node.vm.box = "ubuntu/xenial64"
       node.vm.hostname = "storidge-#{i}"
       node.vm.network :private_network, ip: "10.0.9.#{i + 9}"
-      node.vm.provision "shell", inline: SCRIPT_STORIDGE_SETUP
+      node.vm.provision "shell", inline: PROVISION_SCRIPT
       node.vm.synced_folder ".", "/vagrant", disabled: true
       node.vm.synced_folder "storidge-#{i}", "/shared", create: true
       node.vm.provider "virtualbox" do |vb|

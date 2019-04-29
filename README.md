@@ -1,6 +1,6 @@
 # Storidge powered by Vagrant
 
-This repository allows you to quickly setup a Storidge (http://storidge.com/) environment on Ubuntu 16.04 using Vagrant.
+This repository allows you to quickly setup a Storidge environment (http://storidge.com/) on Ubuntu 16.04 using Vagrant.
 
 ## Requirements
 
@@ -31,33 +31,26 @@ export VAGRANT_STORIDGE_DATA_DISK_SIZE=20
 vagrant up
 ```
 
-That's it, you can now access each node via `vagrant ssh` and use the `cioctl` binary to setup your cluster.
+After the VMs are ready, use the following script to install and setup Storidge:
 
 ```
-vagrant ssh storidge-1
-> cioctl create ...
+./02-install-cio-and-setup-cluster.sh all
 ```
-
-A convenience setup script can be used to setup:
-
-**WARNING**: This script can only be used with a 3 node cluster (default configuration), it will not work if you tuned the `VAGRANT_STORIDGE_CLUSTER_NODES` variable.
 
 **NOTE**: This script will also expose the Docker API over TCP for the first node of the cluster (`10.0.9.10:2375`).
 
-```
-./setup_storidge.sh
-```
-
 After the setup is completed, you can access the Portainer interface on *10.0.9.10:9000*.
 
-## Problem with latest kernel version
+## Convenience scripts
 
-**WARNING - 25.04.2019**: Due to an issue with CIO 2751 and latest kernel version (4.4.0-146), we need to force the kernel version to 4.4.0-142.
+The `01-downgrade-kernel.sh` script can be used to downgrade each VM kernel version to a specific kernel version.
 
-Use the following scripts to setup the cluster:
+You must configure the `KERNEL_VERSION` variable in this script first and then start it before using the `02-install-cio-and-setup-cluster.sh` script.
+
 
 ```
+vagrant up
 ./01-downgrade-kernel.sh
-# Wait for cluster to reboot entirely
-./02-install-cio-and-setup-clister.sh all
+# Wait for VMs to reboot
+./02-install-cio-and-setup-cluster.sh all
 ```
